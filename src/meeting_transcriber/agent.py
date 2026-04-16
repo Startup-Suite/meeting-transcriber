@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import uuid
 from dataclasses import dataclass
 
 from livekit import rtc
@@ -75,7 +76,7 @@ class TrackTranscriber:
 
     async def _publish(self, text: str, *, final: bool) -> None:
         segment = rtc.TranscriptionSegment(
-            id=rtc.generate_sid(),
+            id=f"SG_{uuid.uuid4().hex[:12]}",
             text=text,
             start_time=0,
             end_time=0,
