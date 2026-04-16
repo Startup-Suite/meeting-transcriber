@@ -13,17 +13,11 @@ import logging
 from dataclasses import dataclass
 
 from livekit import rtc
-from livekit.agents import (
-    AutoSubscribe,
-    JobContext,
-    JobRequest,
-    WorkerOptions,
-    cli,
-    stt as stt_module,
-)
+from livekit.agents import AutoSubscribe, JobContext, JobRequest, WorkerOptions, cli
+from livekit.agents import stt as stt_module
 from livekit.plugins import openai, silero
 
-from .config import Config, load_config, room_matches
+from .config import load_config, room_matches
 
 logger = logging.getLogger("meeting_transcriber")
 
