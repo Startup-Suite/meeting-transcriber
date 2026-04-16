@@ -105,7 +105,10 @@ async def request_fnc(req: JobRequest) -> None:
     """
     cfg = load_config()
     if room_matches(req.room.name, cfg.room_pattern):
-        await req.accept(identity=_agent_identity(req.room.name))
+        await req.accept(
+            identity=_agent_identity(req.room.name),
+            name="Transcription",
+        )
     else:
         await req.reject()
 
