@@ -1,0 +1,16 @@
+# Example compose file. Copy + fill in env, then `docker compose up -d`.
+# See .env.example for all required variables.
+
+services:
+  meeting-transcriber:
+    build: .
+    # Or use the pre-built image once published:
+    # image: ghcr.io/startup-suite/meeting-transcriber:latest
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Agent is a CPU-only worker — all GPU work happens in your STT backend.
+    deploy:
+      resources:
+        limits:
+          memory: 512M

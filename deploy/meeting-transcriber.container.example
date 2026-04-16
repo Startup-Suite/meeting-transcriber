@@ -1,0 +1,23 @@
+# Example Podman Quadlet for meeting-transcriber.
+#
+# Usage:
+#   1. Copy this file to ~/.config/containers/systemd/meeting-transcriber.container
+#   2. Write an env file at ~/containers/meeting-transcriber/env (see .env.example)
+#   3. systemctl --user daemon-reload
+#   4. systemctl --user enable --now meeting-transcriber.service
+
+[Container]
+ContainerName=meeting-transcriber
+Image=ghcr.io/startup-suite/meeting-transcriber:latest
+EnvironmentFile=%h/containers/meeting-transcriber/env
+AutoUpdate=registry
+
+# No GPU needed in the worker container — all inference runs in your STT
+# backend (OpenAI hosted Whisper, speaches on a separate GPU host, etc.).
+
+[Service]
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

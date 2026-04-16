@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "meeting-transcriber"
+version = "0.1.0"
+description = "LiveKit Agents worker that transcribes Startup Suite meetings via any OpenAI-compatible STT backend."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Startup Suite" }
+]
+keywords = ["livekit", "transcription", "whisper", "stt", "agents", "meetings"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Communications :: Conferencing",
+]
+
+dependencies = [
+  "livekit-agents[silero]>=0.11.0",
+  "livekit-plugins-openai>=0.10.0",
+  "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.6",
+  "mypy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/Startup-Suite/meeting-transcriber"
+Repository = "https://github.com/Startup-Suite/meeting-transcriber"
+Issues = "https://github.com/Startup-Suite/meeting-transcriber/issues"
+
+[project.scripts]
+meeting-transcriber = "meeting_transcriber.agent:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/meeting_transcriber"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
