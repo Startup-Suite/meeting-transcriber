@@ -119,11 +119,44 @@ All config is environment-driven. See [`.env.example`](./.env.example) for the f
 | `STT_MODEL` | yes | Model name the STT backend expects |
 | `ROOM_PATTERN` | no | Glob for room names to join (default `*`). Use `space-*` for Startup Suite. |
 | `IDLE_TIMEOUT_S` | no | Seconds of silence before disconnect (default `300`) |
+| `EMPTY_GRACE_S` | no | Seconds after the last human leaves before the agent self-disconnects (default `20`; `0` disables) |
+| `PERSIST_URL` | no | HTTP endpoint to POST final segments to (enables durable transcript storage; disabled when empty) |
+| `PERSIST_TOKEN` | no | Bearer token sent with `PERSIST_URL` requests |
 | `LOG_LEVEL` | no | Python log level (default `INFO`) |
 
 ### Room routing
 
 `ROOM_PATTERN` lets multiple LiveKit agents coexist on the same server without fighting for jobs. A common setup is a phone-conversation agent (joins `phone-*`) plus this transcriber (joins `space-*`). Each agent only accepts jobs for its matching rooms.
+
+The worker also registers with `agent_name="meeting-transcriber"`, so LiveKit clients that mint tokens with an explicit `roomConfig.agents` dispatch can route jobs directly to this worker without relying on pattern matching.
+
+### Persistence
+
+When `PERSIST_URL` is set, each final segment is POSTed as JSON to that endpoint alongside the usual `publish_transcription` data-channel broadcast. Body shape:
+
+```json
+{
+  "room_sid": "RM_xxx",
+  "room_name": "space-<uuid>",
+  "segments": [
+    {
+      "participant_identity": "user:...",
+      "speaker_name": "Alice",
+      "text": "hello",
+      "start_time": 0,
+      "end_time": 0,
+      "language": "en",
+      "final": true
+    }
+  ]
+}
+```
+
+Startup Suite's core exposes a compatible endpoint at `POST /api/meetings/segments`. The LiveKit data-channel publish is unaffected — live captions continue to work whether or not persistence is wired.
+
+### Empty-room teardown
+
+When the last human participant leaves, the agent waits `EMPTY_GRACE_S` seconds (default 20) and then disconnects. This triggers LiveKit's `room_finished` webhook so downstream systems can finalize transcripts and run post-processing (e.g., LLM summaries) promptly, rather than waiting for LiveKit's much longer `empty_timeout`.
 
 ## Development
 

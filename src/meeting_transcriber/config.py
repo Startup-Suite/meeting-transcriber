@@ -35,6 +35,18 @@ class Config:
 
     log_level: str
 
+    # Optional: push final transcription segments to a Suite-style HTTP
+    # endpoint for durable persistence. The agent always publishes via
+    # LiveKit's data channel (for live captions); this is an additional
+    # out-of-band sink. Disabled when `persist_url` is empty.
+    persist_url: str
+    persist_token: str
+
+    # Grace period (seconds) after the last human participant leaves before
+    # the agent disconnects from the room. Zero disables — the agent stays
+    # until the LiveKit idle_timeout triggers teardown.
+    empty_grace_s: int
+
 
 def load_config() -> Config:
     """Load configuration from env. `.env` is read if present (dev convenience)."""
@@ -50,6 +62,9 @@ def load_config() -> Config:
         room_pattern=os.getenv("ROOM_PATTERN", "*"),
         idle_timeout_s=int(os.getenv("IDLE_TIMEOUT_S", "300")),
         log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
+        persist_url=os.getenv("PERSIST_URL", "").strip(),
+        persist_token=os.getenv("PERSIST_TOKEN", "").strip(),
+        empty_grace_s=int(os.getenv("EMPTY_GRACE_S", "20")),
     )
 
 
